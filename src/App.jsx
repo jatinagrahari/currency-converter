@@ -1,85 +1,52 @@
-import { useState } from "react";
-import Input from "./components/Input";
+import React, { useState } from "react";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+import Hero from "./components/features/Hero";
+import ConverterCard from "./components/features/ConverterCard";
 import useCurrencyInfo from "./hooks/useCurrencyInfo";
-// import { BackgroundImage } from "../src/assets/1.jpg";
 
 function App() {
-  const [amount, setAmount] = useState(0);
-  const [from, setFrom] = useState("usd");
-  const [to, setTo] = useState("inr");
-  const [convertedAmount, setConvertedAmount] = useState(0);
+  const [fromCurrency, setFromCurrency] = useState("usd");
+  const [toCurrency, setToCurrency] = useState("inr");
 
-  const currencyInfo = useCurrencyInfo(from);
-
-  const options = Object.keys(currencyInfo);
-
-  const swap = () => {
-    setFrom(to);
-    setTo(from);
-    setConvertedAmount(amount);
-    setAmount(convertedAmount);
-  };
-
-  const convert = () => {
-    setConvertedAmount(amount * (currencyInfo[to]?.value || 0));
-  };
+  const { rates, loading, error, lastUpdated, convert } = useCurrencyInfo();
+  
+  // Create an array of available currency codes from the API response
+  const currencyOptions = Object.keys(rates).length > 0 ? Object.keys(rates).map(c => c.toLowerCase()) : ['usd', 'inr', 'eur', 'gbp'];
 
   return (
-    <div
-      className="w-full h-screen flex flex-wrap justify-center items-center bg-cover bg-no-repeat"
-      style={{
-        backgroundImage: `url('https://images.pexels.com/photos/5746260/pexels-photo-5746260.jpeg')`,
-      }}
-    >
-      <div className="w-full">
-        <div className="w-full max-w-md mx-auto border border-gray-60 rounded-lg p-5 backdrop-blur-sm bg-white/30">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              convert();
-            }}
-          >
-            <div className="w-full mb-1">
-              <Input
-                label="From"
-                amount={amount}
-                currencyOptions={options}
-                onCurrencyChange={(currency) => {
-                  setAmount(amount);
-                }}
-                selectCurrency={from}
-                OnAmountChange={(amount) => setAmount(amount)}
-              />
-            </div>
-            <div className="relative w-full h-0.5">
-              <button
-                type="button"
-                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-white rounded-md bg-blue-600 text-white px-2 py-0.5"
-                onClick={swap}
-              >
-                swap
-              </button>
-            </div>
-            <div className="w-full mt-1 mb-4">
-              <Input
-                label="To"
-                amount={convertedAmount}
-                currencyOptions={options}
-                onCurrencyChange={(currency) => {
-                  setTo(currency);
-                }}
-                selectCurrency={from}
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg"
-            >
-              Convert {from.toUpperCase()} to {to.toUpperCase()}
-            </button>
-          </form>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0b] text-gray-900 dark:text-gray-100 font-sans selection:bg-blue-500/30 transition-colors flex flex-col relative overflow-hidden">
+      
+      {/* Background gradients for premium aesthetic */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-400/20 dark:bg-blue-600/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[-10%] w-[30%] h-[30%] rounded-full bg-indigo-400/20 dark:bg-indigo-600/10 blur-[120px] pointer-events-none" />
+      
+      <Navbar lastUpdated={lastUpdated} loading={loading} />
+      
+      <main className="flex-1 w-full relative z-10 px-4 sm:px-6 lg:px-8 flex flex-col">
+        <Hero />
+        
+        {error ? (
+          <div className="max-w-4xl mx-auto w-full p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-2xl text-center">
+            <h3 className="text-red-800 dark:text-red-400 font-bold text-lg mb-2">Connection Error</h3>
+            <p className="text-red-600 dark:text-red-300">{error}</p>
+          </div>
+        ) : (
+          <div className="w-full flex-1 flex flex-col">
+            <ConverterCard 
+              currencyOptions={currencyOptions}
+              fromCurrency={fromCurrency}
+              toCurrency={toCurrency}
+              setFromCurrency={setFromCurrency}
+              setToCurrency={setToCurrency}
+              onConvert={convert}
+              loading={loading}
+            />
+          </div>
+        )}
+      </main>
+
+      <Footer />
     </div>
   );
 }
