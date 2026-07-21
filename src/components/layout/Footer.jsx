@@ -1,5 +1,5 @@
 import React from "react";
-import { IoLogoGithub, IoLogoLinkedin } from "react-icons/io5";
+import { IoLogoGithub, IoLogoLinkedin, IoGlobeOutline } from "react-icons/io5";
 
 const Footer = () => {
   return (
@@ -14,6 +14,14 @@ const Footer = () => {
         </div>
 
         <div className="flex items-center space-x-6">
+          <a
+            href="https://jatinagrahari.com"
+            target="_blank"
+            className="hover:text-gray-900 dark:hover:text-zinc-300 transition-colors flex items-center gap-2 group"
+          >
+            <IoGlobeOutline className="text-xl group-hover:-translate-y-0.5 transition-transform" />{" "}
+            Portfolio
+          </a>
           <a
             href="https://github.com/jatinagrahari"
             target="_blank"
